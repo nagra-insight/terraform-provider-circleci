@@ -174,8 +174,6 @@ github.com/hashicorp/terraform-config-inspect/tfconfig
 github.com/hashicorp/yamux
 # github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af
 github.com/jmespath/go-jmespath
-# github.com/jszwedko/go-circleci v0.2.0 => github.com/tgermain/go-circleci v0.0.0-20181207123242-bfc5b3445bba
-github.com/jszwedko/go-circleci
 # github.com/mattn/go-colorable v0.1.1
 github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.5

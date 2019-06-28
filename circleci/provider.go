@@ -45,5 +45,5 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	vcsType := d.Get("vcs_type").(string)
 	organization := d.Get("organization").(string)
 	url := d.Get("url").(string)
-	return NewConfig(token, vcsType, organization, url)
+	return NewClient(token, vcsType, organization, WithBaseURL(url))
 }

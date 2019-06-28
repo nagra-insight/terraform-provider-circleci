@@ -124,6 +124,41 @@ func TestClient_GetEnvironmentVariableOK(t *testing.T) {
 	}, envVar)
 }
 
+func TestClient_GetEnvironmentVariableWrongStatus(t *testing.T) {
+	token := fmt.Sprintf("%d", time.Now().UnixNano())
+
+	httpClient := &http.Client{
+		Transport: testingRoundTripper(func(r *http.Request) (*http.Response, error) {
+			assert.Equal(t, http.MethodGet, r.Method)
+			assert.Equal(t, "application/json", r.Header.Get("Accept"))
+
+			username, password, ok := r.BasicAuth()
+			assert.True(t, ok)
+			assert.Equal(t, token, username)
+			assert.Equal(t, "", password)
+
+			assert.Nil(t, r.Body)
+
+			return &http.Response{
+				StatusCode: http.StatusBadRequest,
+				Body:       ioutil.NopCloser(nil),
+			}, nil
+		}),
+	}
+
+	client := Client{
+		token:        token,
+		vcsType:      "github",
+		organization: "foo",
+		httpClient:   httpClient,
+	}
+
+	envVar, err := client.GetEnvironmentVariable("bar", "key")
+	assert.Error(t, err)
+	assert.Equal(t, err.Error(), "circleci: wrong status code 400 getting environment variable")
+	assert.Nil(t, envVar)
+}
+
 func TestClient_DeleteEnvironmentVariableOK(t *testing.T) {
 	token := fmt.Sprintf("%d", time.Now().UnixNano())
 
@@ -155,4 +190,38 @@ func TestClient_DeleteEnvironmentVariableOK(t *testing.T) {
 
 	err := client.DeleteEnvironmentVariable("bar", "key")
 	assert.NoError(t, err)
+}
+
+func TestClient_DeleteEnvironmentVariableWrongStatus(t *testing.T) {
+	token := fmt.Sprintf("%d", time.Now().UnixNano())
+
+	httpClient := &http.Client{
+		Transport: testingRoundTripper(func(r *http.Request) (*http.Response, error) {
+			assert.Equal(t, http.MethodDelete, r.Method)
+			assert.Equal(t, "application/json", r.Header.Get("Accept"))
+
+			username, password, ok := r.BasicAuth()
+			assert.True(t, ok)
+			assert.Equal(t, token, username)
+			assert.Equal(t, "", password)
+
+			assert.Nil(t, r.Body)
+
+			return &http.Response{
+				StatusCode: http.StatusNotFound,
+				Body:       ioutil.NopCloser(nil),
+			}, nil
+		}),
+	}
+
+	client := Client{
+		token:        token,
+		vcsType:      "github",
+		organization: "foo",
+		httpClient:   httpClient,
+	}
+
+	err := client.DeleteEnvironmentVariable("bar", "key")
+	assert.Error(t, err)
+	assert.Equal(t, err.Error(), "circleci: wrong status code 404 deleting environment variable")
 }
