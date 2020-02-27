@@ -53,7 +53,7 @@ workflows:
       - build:
           filters:
             tags:
-              only: /^v\d+\.\d+\.\d+$/
+              only: /^v\d+\.\d+\.\d+-ni.\d+$/
       - release:
           requires:
             - build
@@ -61,4 +61,4 @@ workflows:
             branches:
               ignore: /.*/
             tags:
-              only: /^v\d+\.\d+\.\d+$/
+              only: /^v\d+\.\d+\.\d+-ni.\d+$/
